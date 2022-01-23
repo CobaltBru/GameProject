@@ -18,14 +18,27 @@ public class playerControl : MonoBehaviour
         float xspeed = fhorizontal * speed;
         transform.Translate(Vector2.right*xspeed * Time.deltaTime);
     }
-    private void OnCollisionEnter2D(Collision2D col)
+    void OnCollisionStay2D(Collision2D collision)
     {
-        ContactPoint2D pos = col.GetContacts(col.contacts);
+        List<ContactPoint2D> contacts = new List<ContactPoint2D>();
+        int length = collision.GetContacts(contacts);
+        for (int i = 0; i < length; i++) 
+            {
+                if (contacts[i].normal.y > 0.7f)
+                {
+                    playerRegidbody.velocity = new Vector2(0, jumpPower);
+                break;
+                }
+            }
+    }
 
-        if (transform.position.y>col.contacts)
+    private void OnTriggerEnter2D(Collider2D col)
+    {
+        if(col.tag=="Dead")
         {
-            playerRegidbody.velocity = new Vector2(0, 0);
-            playerRegidbody.velocity = new Vector2(0, jumpPower);
+            Destroy(gameObject);
         }
     }
+
+
 }
