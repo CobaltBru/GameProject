@@ -34,9 +34,14 @@ public class playerControl : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D col)
     {
+        
         if(col.tag=="Dead")
         {
             Destroy(gameObject);
+        }
+        if (col.tag == "Success")
+        {
+            col.GetComponent<GemScript>().DestroyGem(transform.position);
         }
     }
 
