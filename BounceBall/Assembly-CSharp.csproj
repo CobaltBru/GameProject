@@ -53,10 +53,13 @@
     <UnityVersion>2020.3.26f1</UnityVersion>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Assets\Script\playerControl.cs" />
-    <Compile Include="Assets\Script\GemScript.cs" />
     <Compile Include="Assets\Script\GameManager.cs" />
     <Compile Include="Assets\Script\StageManager.cs" />
+    <Compile Include="Assets\Script\playerControl.cs" />
+    <Compile Include="Assets\Script\GemScript.cs" />
+    <Compile Include="Assets\Script\ButtonReload.cs" />
+    <Compile Include="Assets\Script\gotoStageButton.cs" />
+    <Compile Include="Assets\Script\mainMenuButton.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">

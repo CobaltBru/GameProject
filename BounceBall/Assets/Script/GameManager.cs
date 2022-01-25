@@ -4,13 +4,15 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
-    // Start is called before the first frame update
+    static public int currentStage;
+    static public GameObject currentStageObject;
+    static public GameObject MainMenuObject;
+    static public GameObject endMessage;
     void Start()
     {
-        
+        MainMenuObject = GameObject.Find("MainMenu").gameObject;
+        endMessage = GameObject.Find("EndMessage").gameObject;
     }
-
-    // Update is called once per frame
     void Update()
     {
         

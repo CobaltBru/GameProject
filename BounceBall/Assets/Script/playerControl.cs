@@ -7,9 +7,11 @@ public class playerControl : MonoBehaviour
     public float jumpPower = 13f;
     public float speed = 5f;
     public Rigidbody2D playerRegidbody;
+    GemScript gem;
     void Start()
     {
         playerRegidbody = GetComponent<Rigidbody2D>();
+        gem = GetComponent<GemScript>();
     }
 
     void Update()
@@ -18,7 +20,7 @@ public class playerControl : MonoBehaviour
         float xspeed = fhorizontal * speed;
         transform.Translate(Vector2.right*xspeed * Time.deltaTime);
     }
-    void OnCollisionStay2D(Collision2D collision)
+    void OnCollisionEnter2D(Collision2D collision)
     {
         List<ContactPoint2D> contacts = new List<ContactPoint2D>();
         int length = collision.GetContacts(contacts);
@@ -34,14 +36,16 @@ public class playerControl : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D col)
     {
-        
+        gem = col.gameObject.GetComponent<GemScript>();
         if(col.tag=="Dead")
         {
             Destroy(gameObject);
         }
         if (col.tag == "Success")
         {
-            col.GetComponent<GemScript>().DestroyGem(transform.position);
+            col.gameObject.SetActive(false);
+            StageManager.GemCount--;
+            Debug.Log(StageManager.GemCount);
         }
     }
 
