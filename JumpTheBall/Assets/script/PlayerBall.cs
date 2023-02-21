@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class PlayerBall : MonoBehaviour
 {
@@ -10,6 +12,8 @@ public class PlayerBall : MonoBehaviour
     public float JumpPower;
     public int itemCount;
     AudioSource audio;
+
+    public GameManagerLogic manager;
     void Awake()
     {
         isJump = false;
@@ -33,19 +37,35 @@ public class PlayerBall : MonoBehaviour
         rigid.AddForce(new Vector3(h, 0, v),ForceMode.Impulse);
     }
 
-    private void OnCollisionEnter(Collision collision)
+    void OnCollisionEnter(Collision collision)
     {
         if (collision.gameObject.name == "Floor")
             isJump = false;
     }
 
-    private void OnTriggerEnter(Collider other)
+    void OnTriggerEnter(Collider other)
     {
         if (other.tag == "Item")
         {
             itemCount++;
             audio.Play();
             other.gameObject.SetActive(false);
+            manager.GetItem(itemCount);
+        }
+
+        else if (other.tag == "Finish")
+        {
+            if(itemCount == manager.totalItemCount)
+            {
+                if (manager.stage == 1) SceneManager.LoadScene(0);
+                //Clear;
+                else SceneManager.LoadScene(manager.stage + 1);
+            }
+            else
+            {
+                //Restart
+                SceneManager.LoadScene(manager.stage);
+            }
         }
     }
 }
