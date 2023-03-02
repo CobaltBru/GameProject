@@ -79,9 +79,43 @@ public class PlayerMove : MonoBehaviour
     {
         if(collision.gameObject.tag == "Enemy")
         {
-            OnDamaged(collision.transform.position);
+            //Attck
+            if(rigid.velocity.y < 0 && transform.position.y > collision.transform.position.y)
+            {
+                OnAttack(collision.transform);
+            }
+            
+            else //Damaged
+                OnDamaged(collision.transform.position);
         }
     }
+
+    void OnTriggerEnter2D(Collider2D collision)
+    {
+        if(collision.gameObject.tag =="Item")
+        {
+            //Point
+
+            //Deactive item
+            collision.gameObject.SetActive(false);
+        }
+        else if (collision.gameObject.tag == "Finish")
+        {
+            //Next Stage
+        }
+    }
+
+    void OnAttack(Transform enemy)
+    {
+        //Point
+
+        //Reaction Force
+        rigid.AddForce(Vector2.up*5, ForceMode2D.Impulse);
+        //Enemy Die
+        EnemyMove enemyMove = enemy.GetComponent<EnemyMove>();
+        enemyMove.OnDamaged();
+    }
+
     void OnDamaged(Vector2 targetPos)
     {
         //Change layer
