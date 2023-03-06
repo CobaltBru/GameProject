@@ -28,7 +28,6 @@ public class EnemyMove : MonoBehaviour
 
         //Platform Check
         Vector2 frontVec = new Vector2(rigid.position.x + nextMove*0.5f, rigid.position.y);
-        Debug.DrawRay(frontVec, Vector3.down, new Color(0, 1, 0));
         RaycastHit2D rayHit = Physics2D.Raycast(frontVec, Vector3.down, 1, LayerMask.GetMask("Platform"));
         if (rayHit.collider == null)
         {
@@ -54,7 +53,8 @@ public class EnemyMove : MonoBehaviour
 
     void Turn()
     {
-        nextMove *= -1;
+        if (spriteRenderer.flipY == true) nextMove = 0;
+        else nextMove *= -1;
         if (nextMove != 0)
             spriteRenderer.flipX = nextMove == 1;
         CancelInvoke();
@@ -72,7 +72,13 @@ public class EnemyMove : MonoBehaviour
         //Die Effect Jump
         rigid.AddForce(Vector2.up*5,ForceMode2D.Impulse);
         //Destroy
-        Invoke("DeActive", 0.5f);
+        StartCoroutine(Croute());
+    }
+
+    IEnumerator Croute()
+    {
+        yield return new WaitForSeconds(3);
+        DeActive();
     }
 
     public void DeActive()
