@@ -30,14 +30,17 @@ public class PinSpawner : MonoBehaviour
     private float bottomAngle = 270;
     private List<Pin> throwablePins;
 
+    private AudioSource audioSource;
+
     public void Setup()
     {
+        audioSource = GetComponent<AudioSource>();
         throwablePins = new List<Pin>();
     }
 
     private void Update()
     {
-        if (stageController.IsGameOver == true) return;
+        if (stageController.IsGameStart == false || stageController.IsGameOver == true) return;
         if(Input.GetMouseButtonDown(0) && throwablePins.Count>0)
         {
             SetInPinStuckToTarget(throwablePins[0].transform, bottomAngle);
@@ -47,6 +50,9 @@ public class PinSpawner : MonoBehaviour
             {
                 throwablePins[i].MoveOneStep(stageController.TPinDistance);
             }
+            stageController.DecreaseThrowablePin();
+
+            audioSource.Play();
         }
     }
 
