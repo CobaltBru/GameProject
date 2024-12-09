@@ -4,6 +4,8 @@ public class PlayerController : MonoBehaviour
 {
     [SerializeField]
     private StageController stageController;
+    [SerializeField]
+    private GameObject playerDieEffect;
     private Movement2D movement;
 
     private void Awake()
@@ -29,10 +31,11 @@ public class PlayerController : MonoBehaviour
         {
             stageController.IncreaseScore(1);
 
-            Destroy(collision.gameObject);
+            collision.GetComponent<Item>().Exit();
         }
         else if(collision.tag.Equals("Obstacle"))
         {
+            Instantiate(playerDieEffect, transform.position, Quaternion.identity);
             Destroy(GetComponent<Rigidbody2D>());
             stageController.GameOver();
         }

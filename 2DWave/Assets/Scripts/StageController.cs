@@ -23,6 +23,7 @@ public class StageController : MonoBehaviour
 
     private int currentScore = 0;
     private int bestScore = 0;
+    private float gameOverDelayTime = 1;
 
     public bool IsGameOver { private set; get; } = false;
 
@@ -56,9 +57,16 @@ public class StageController : MonoBehaviour
 
     public void GameOver()
     {
+        ShakeCamera.Instance.OnShakeCamera(0.5f, 0.1f);
         IsGameOver = true;
+        StartCoroutine("OnGameOver");
+    }
 
-        if(currentScore == bestScore)
+    private IEnumerator OnGameOver()
+    {
+        yield return new WaitForSeconds(gameOverDelayTime);
+
+        if (currentScore == bestScore)
         {
             PlayerPrefs.SetInt("BestScore", currentScore);
         }
