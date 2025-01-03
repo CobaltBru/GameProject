@@ -8,7 +8,7 @@ public class NodeSpawner : MonoBehaviour
     [SerializeField]
     private RectTransform nodeRect;
 
-    public List<Node> SpawnNodes(Vector2Int blockCount) 
+    public List<Node> SpawnNodes(Board board, Vector2Int blockCount) 
     {
         List<Node> nodeList = new List<Node>(blockCount.x * blockCount.y);
 
@@ -19,8 +19,20 @@ public class NodeSpawner : MonoBehaviour
                 GameObject clone = Instantiate(nodePrefab, nodeRect.transform);
                 Vector2Int point = new Vector2Int(x,y);
 
+                Vector2Int?[] neighborNodes = new Vector2Int?[4];
+                Vector2Int right = point + Vector2Int.right;
+                Vector2Int down = point + Vector2Int.up;
+                Vector2Int left = point + Vector2Int.left;
+                Vector2Int up = point + Vector2Int.down;
+
+                if (IsValid(right, blockCount)) neighborNodes[0] = right;
+                if (IsValid(down, blockCount)) neighborNodes[1] = down;
+                if (IsValid(left, blockCount)) neighborNodes[2] = left;
+                if (IsValid(up, blockCount)) neighborNodes[3] = up;
+
+
                 Node node = clone.GetComponent<Node>();
-                node.Setup(point);
+                node.Setup(board, neighborNodes, point);
 
                 clone.name = $"[{node.Point.y}, {node.Point.x}]";
 
@@ -28,5 +40,14 @@ public class NodeSpawner : MonoBehaviour
             }
         }
         return nodeList;
+    }
+
+    private bool IsValid(Vector2Int point, Vector2Int blockCount)
+    {
+        if(point.x == -1 || point.x == blockCount.x || point.y == blockCount.y || point.y == -1)
+        {
+            return false;
+        }
+        return true;
     }
 }
