@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Scripting.APIUpdating;
 
@@ -11,6 +12,8 @@ public class Board : MonoBehaviour
     [SerializeField]
     private TouchController touchController;
     [SerializeField]
+    private UIController uiController;
+    [SerializeField]
     private GameObject blockPrefab;
     [SerializeField]
     private Transform blockRect;
@@ -20,10 +23,15 @@ public class Board : MonoBehaviour
 
     private List<Block> blockList;
     private State state = State.Wait;
+    private int currentScore;
 
     private void Awake()
     {
         BlockCount = new Vector2Int(4, 4);
+
+        currentScore = 0;
+        uiController.UpdateCurrentScore(currentScore);
+
         NodeList = nodeSpawner.SpawnNodes(this, BlockCount);
         blockList = new List<Block>();
     }
@@ -68,7 +76,10 @@ public class Board : MonoBehaviour
         }
         else
         {
-
+            if(IsGameOver())
+            {
+                OnGameOver();
+            }
         }
     }
 
@@ -140,6 +151,11 @@ public class Board : MonoBehaviour
                 block.StartMove();
             }
         }
+
+        if(IsGameOver())
+        {
+            OnGameOver();
+        }
     }
 
     private void BlockProcess(Node node, Direction direction)
@@ -149,7 +165,14 @@ public class Board : MonoBehaviour
         Node neighborNode = node.FindTarget(node, direction);
         if (neighborNode != null)
         {
-            if(neighborNode != null && neighborNode.placedBlock == null)
+            if(node.placedBlock != null && neighborNode.placedBlock != null)
+            {
+                if(node.placedBlock.Numeric == neighborNode.placedBlock.Numeric)
+                {
+                    Combine(node,neighborNode);
+                }
+            }
+            else if(neighborNode != null && neighborNode.placedBlock == null)
             {
                 Move(node, neighborNode);
             }
@@ -165,6 +188,12 @@ public class Board : MonoBehaviour
         }
     }
 
+    private void Combine(Node from, Node to)
+    {
+        from.placedBlock.CombineToNode(to);
+        from.placedBlock = null;
+        to.combined = true;
+    }
     private void UpdateState()
     {
         bool targetAllNull = true;
@@ -180,6 +209,23 @@ public class Board : MonoBehaviour
 
         if(targetAllNull && state == State.Processing)
         {
+            List<Block> removeBlocks = new List<Block>();
+            foreach(Block block in blockList)
+            {
+                if(block.NeedDestroy)
+                {
+                    removeBlocks.Add(block);
+                }
+            }
+
+            removeBlocks.ForEach(x =>
+            {
+                currentScore += x.Numeric * 2;
+                blockList.Remove(x);
+                Destroy(x.gameObject);
+            });
+
+
             state = State.End;
         }
 
@@ -187,7 +233,40 @@ public class Board : MonoBehaviour
         {
             state = State.Wait;
             SpawnBlockToRandomNode();
+
+            NodeList.ForEach(x=> x.combined = false);
+            uiController.UpdateCurrentScore(currentScore);
         }
     }
+
+    private bool IsGameOver()
+    {
+        foreach(Node node in NodeList)
+        {
+            if (node.placedBlock == null) return false;
+            for(int i = 0;i<node.NeighborNodes.Length; i++)
+            {
+                if (node.NeighborNodes[i] == null) continue;
+
+                Vector2Int point = node.NeighborNodes[i].Value;
+                Node neighborNode = NodeList[point.y*BlockCount.x + point.x];
+
+                if(node.placedBlock != null && neighborNode.placedBlock != null)
+                {
+                    if(node.placedBlock.Numeric == neighborNode.placedBlock.Numeric)
+                    {
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
+    }
+
+    private void OnGameOver()
+    {
+        Debug.Log("GameOver");
+    }
+
 }
 

@@ -15,8 +15,10 @@ public class Block : MonoBehaviour
     private TextMeshProUGUI textBlockNumeric;
 
     private int numeric;
+    private bool combine = false;
 
     public Node Target { private set; get; }
+    public bool NeedDestroy { private set; get; } = false;
 
     public int Numeric
     {
@@ -39,6 +41,13 @@ public class Block : MonoBehaviour
     public void MoveToNode(Node to)
     {
         Target = to;
+        combine = false;
+    }
+
+    public void CombineToNode(Node to)
+    {
+        Target = to;
+        combine = true;
     }
 
     public void StartMove()
@@ -51,8 +60,35 @@ public class Block : MonoBehaviour
     {
         if(Target != null)
         {
-            Target = null;
+            if (combine)
+            {
+                Target.placedBlock.Numeric *= 2;
+                Target.placedBlock.StartPunchScale(Vector3.one * 0.25f, 0.15f, OnAfterPunchScale);
+                gameObject.SetActive(false);
+            }
+            else
+            {
+                Target = null;
+            }
+            
         }
+    }
+
+    public void StartPunchScale(Vector3 punch, float time, UnityAction action = null)
+    {
+        StartCoroutine(OnPunchScale(punch, time, action));
+    }
+    private void OnAfterPunchScale()
+    {
+        Target = null;
+        NeedDestroy = true;
+    }
+    private IEnumerator OnPunchScale(Vector3 punch, float time, UnityAction action)
+    {
+        Vector3 current = Vector3.one;
+        yield return StartCoroutine(OnScaleAnimation(current, current + punch, time * 0.5f));
+        yield return StartCoroutine(OnScaleAnimation(current + punch, current, time * 0.5f));
+        if (action != null) action.Invoke();
     }
 
     private IEnumerator OnScaleAnimation(Vector3 start, Vector3 end, float time)
