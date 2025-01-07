@@ -24,15 +24,23 @@ public class Board : MonoBehaviour
     private List<Block> blockList;
     private State state = State.Wait;
     private int currentScore;
+    private int highScore;
+    private float blockSize;
 
     private void Awake()
     {
-        BlockCount = new Vector2Int(4, 4);
+        int count = PlayerPrefs.GetInt("BlockCount");
+        BlockCount = new Vector2Int(count, count);
+
+        blockSize = (1080 - 85 - 25 * (BlockCount.x - 1)) / BlockCount.x;
 
         currentScore = 0;
         uiController.UpdateCurrentScore(currentScore);
 
-        NodeList = nodeSpawner.SpawnNodes(this, BlockCount);
+        highScore = PlayerPrefs.GetInt("HighScore");
+        uiController.UpdateHighScore(highScore);
+
+        NodeList = nodeSpawner.SpawnNodes(this, BlockCount, blockSize);
         blockList = new List<Block>();
     }
 
@@ -91,6 +99,7 @@ public class Board : MonoBehaviour
         Block block = clone.GetComponent<Block>();
         Node node = NodeList[y * BlockCount.x + x];
 
+        clone.GetComponent<RectTransform>().sizeDelta = new Vector2(blockSize, blockSize);
         clone.GetComponent<RectTransform>().localPosition = node.localPosition;
 
         block.Setup();
@@ -265,7 +274,14 @@ public class Board : MonoBehaviour
 
     private void OnGameOver()
     {
-        Debug.Log("GameOver");
+
+        if(currentScore> highScore)
+        {
+            PlayerPrefs.SetInt("HighScore", currentScore);
+        }
+
+        uiController.OnGameOver();
+
     }
 
 }

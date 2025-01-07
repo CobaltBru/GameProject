@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class NodeSpawner : MonoBehaviour
 {
@@ -7,9 +8,14 @@ public class NodeSpawner : MonoBehaviour
     private GameObject nodePrefab;
     [SerializeField]
     private RectTransform nodeRect;
+    [SerializeField]
+    private GridLayoutGroup gridLayoutGroup;
 
-    public List<Node> SpawnNodes(Board board, Vector2Int blockCount) 
+    public List<Node> SpawnNodes(Board board, Vector2Int blockCount, float blockSize) 
     {
+
+        gridLayoutGroup.cellSize = new Vector2(blockSize, blockSize);
+
         List<Node> nodeList = new List<Node>(blockCount.x * blockCount.y);
 
         for(int y = 0; y<blockCount.y;y++)
